@@ -1,0 +1,510 @@
+<!--
+<!DOCTYPE html>
+<html>
+<head>
+	<title>board</title>
+	<script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+
+</body>
+</html>
+http://technologies4.me/articles/character-movement-input-tile-map-a2/character-input-source-code-p5/
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript">
+var can,ctx = null;
+var gameMap = [
+	0,  0,  0,  0,  4,  0,  0,  0, 0,
+	0, 11, 12, 13, 14, 15, 16, 17, 0,
+	0, 21, 22, 23, 24, 25, 26, 27, 0,
+	0, 31, 32, 33, 34, 35, 36, 37, 0,
+	40,41, 42, 43, 44, 45, 46, 47, 48,
+	0, 51, 52, 53, 54, 55, 56, 57, 0,
+	0, 61, 62, 63, 64, 65, 66, 67, 0,
+	0, 71, 72, 73, 74, 75, 76, 77, 0,
+	0,  0,  0,  0, 84,  0,  0,  0, 0 
+];
+var mov1=[false,false,false,false,false,false];
+var mov3=[false,false,false,false,false,false];
+var play1=true,play3=false,f=false,f1=false;
+var tileW = 50, tileH = 50;
+var path1=[0,0,0,0,0,0];
+var path3=[0,0,0,0,0,0];
+var mapW = 9, mapH = 9;
+var die1,die3;
+var r1,r2,face1,face2,image1,image2;
+var r=0;
+
+var h1=[[tileW*4+tileW/4,tileH/4],[tileW*4+2*tileW/4,tileH/4],[tileW*4+3*tileW/4,tileH/4],[tileW*4+tileW/4,3*tileH/4],[tileW*4+2*tileW/4,3*tileH/4],[tileW*4+3*tileW/4,3*tileH/4]];
+var h2=[[tileW/4,tileW*4+tileH/4],[tileW/4,tileW*4+2*tileH/4],[tileW/4,tileW*4+3*tileH/4],[3*tileW/4,tileW*4+tileH/4],[3*tileW/4,tileW*4+2*tileH/4],[3*tileW/4,tileW*4+3*tileH/4]];
+var h3=[[tileW*4+tileW/4,tileW*8+tileH/4],[tileW*4+2*tileW/4,tileW*8+tileH/4],[tileW*4+3*tileW/4,tileW*8+tileH/4],[tileW*4+tileW/4,tileW*8+3*tileH/4],[tileW*4+2*tileW/4,tileW*8+3*tileH/4],[tileW*4+3*tileW/4,tileW*8+3*tileH/4]];
+var h4=[[tileW*8+tileW/4,tileW*4+tileH/4],[tileW*8+tileW/4,tileW*4+2*tileH/4],[tileW*8+tileW/4,tileW*4+3*tileH/4],[tileW*8+3*tileW/4,tileW*4+tileH/4],[tileW*8+3*tileW/4,tileW*4+2*tileH/4],[tileW*8+3*tileW/4,tileW*4+3*tileH/4]];
+
+
+var blueRoute = [14,13,12,11,21,31,41,51,61,71,72,73,74,75,76,77,67,57,47,37,27,17,16,15,
+26,36,46,56,66,65,64,63,62,52,42,32,22,23,24,25,35,45,55,54,53,43,33,34,44];
+
+var redRoute = [74,75,76,77,67,57,47,37,27,17,16,15,14,13,12,11,21,31,41,51,61,71,72,73,
+62,52,42,32,22,23,24,25,26,36,46,56,66,65,64,63,53,43,33,34,35,45,55,54,44];
+
+var player1 = [new Character(blueRoute,path1,h1,0),new Character(blueRoute,path1,h1,1),new Character(blueRoute,path1,h1,2),new Character(blueRoute,path1,h1,3),new Character(blueRoute,path1,h1,4),new Character(blueRoute,path1,h1,5)];
+/*var player2 = [new Character(h2,0),new Character(h2,1),new Character(h2,2),new Character(h2,3),new Character(h2,4),new Character(h2,5)]; */
+var player3 = [new Character(redRoute,path3,h3,0),new Character(redRoute,path3,h3,1),new Character(redRoute,path3,h3,2),new Character(redRoute,path3,h3,3),new Character(redRoute,path3,h3,4),new Character(redRoute,path3,h3,5)];
+/*var player4 = [new Character(h4,0),new Character(h4,1),new Character(h4,2),new Character(h4,3),new Character(h4,4),new Character(h4,5)];*/
+
+
+function Character(route,path,h,m)
+{
+	this.tileFrom	= [route[path[m]]%10,Math.floor(route[path[m]]/10)];
+	this.tileTo		= [route[path[m]]%10,Math.floor(route[path[m]]/10)];
+	this.timeMoved	= 0;
+	this.dimensions	= [tileW/5,tileH/5];
+	this.position	= [h[m][0],h[m][1]];	
+	this.delayMove	= 700;
+}
+Character.prototype.placeAt = function(x, y)
+{
+	this.tileFrom	= [x,y];
+	this.tileTo		= [x,y];
+	this.position	= [((tileW*x)+tileW/2),((tileH*y)+tileH/2)];
+};
+Character.prototype.processMovement = function(route,path,t)
+{
+	if(this.tileFrom[0]==this.tileTo[0] && this.tileFrom[1]==this.tileTo[1]) { return false; }
+
+	if((t-this.timeMoved)>=this.delayMove)
+	{
+		this.placeAt(route[path]%10, Math.floor(route[path]/10));
+	}
+	else
+	{
+		this.position[0] = (route[path-1]%10 * tileW) + (tileW/2);
+		this.position[1] = (Math.floor(route[path-1]/10) * tileH) + (tileH/2);
+		if(this.tileTo[0] != this.tileFrom[0])
+		{
+			var diff = (tileW / this.delayMove) * (t-this.timeMoved);
+			this.position[0]+= (this.tileTo[0]<this.tileFrom[0] ? 0 - diff : diff);
+		}
+
+		if(this.tileTo[1] != this.tileFrom[1])
+		{
+			var diff = (tileH / this.delayMove) * (t-this.timeMoved);
+			this.position[1]+= (this.tileTo[1]<this.tileFrom[1] ? 0 - diff : diff);
+		}
+		this.position[0] = Math.round(this.position[0]);
+		this.position[1] = Math.round(this.position[1]);
+	}
+
+	return true;
+}
+
+
+window.onload = function()
+{
+	can=document.getElementById('game');
+	ctx = can.getContext("2d");
+	die1=document.querySelector(".d1");
+	die3=document.querySelector(".d3");
+	requestAnimationFrame(drawGame);
+	
+};
+
+function drawGame()
+{
+
+	if(ctx==null) { return; }
+	var currentFrameTime = Date.now();
+	if(play1 && r==0)
+	{
+		play1=false;
+		f1=false;
+	var button1 = document.createElement("button");
+    button1.innerHTML = "roll";
+    image1 = document.createElement("img");
+	image2 = document.createElement("img");
+	
+	
+	 while (die3.hasChildNodes()) {
+    die3.removeChild(die3.firstChild);
+  	}
+	
+	while (die1.hasChildNodes()) {
+    die1.removeChild(die1.firstChild);
+  	}
+	die1.appendChild(button1);
+	button1.addEventListener ("click",function()
+	{
+  	 r1=Math.floor(Math.random()*4);
+ 	 r2=Math.floor(Math.random()*4);
+  	 face1="dice"+r1+".png";
+  	 face2="dice"+r2+".png";
+  	 image1.src=face1;
+  	 image2.src=face2;
+     die1.removeChild(button1);
+     die1.appendChild(image1);
+  	 die1.appendChild(image2);
+  	 r=r1+r2;
+  	 if(r==0){r=12;}
+  	 if(r==12 || r==1 || r==5 || r==6)
+  	 {
+    	die1.appendChild(button1);
+    	play1=true;
+  	 }
+  	 var fa=false;
+  	 if(r>1 && r<5){
+  	 	play3=true;
+  	 	fa=true;
+  	   		for(var k=0;k<6;k++)
+  	   		{
+  	   			if(player1[k].position[0]!=h1[k][0] && player1[k].position[1]!=h1[k][1]){
+  	   				fa=false;
+  	   				break;
+  	   			}
+  	   		}
+  	 }
+  	if(fa){
+  		r=0;f=false;
+  	}
+  	else{
+  		f=true;
+  	}
+});
+}
+if(f){
+  can.addEventListener("mousedown",function(e)
+  {
+  	var x=e.pageX-can.offsetLeft;
+  	var y=e.pageY-can.offsetTop;
+  	var c=0;
+  	if(r==1 || r==5 || r==6)
+  	{
+  	   if(x>=4*tileW && x<=5*tileW && y>=0 && y<=tileH)
+  	   {
+  	   		for(var k=0;k<6 && c<r;k++)
+  	   		{
+  	   			if(player1[k].position[0]==h1[k][0] && player1[k].position[1]==h1[k][1]){
+  	   			player1[k].placeAt(blueRoute[0]%10, Math.floor(blueRoute[0]/10));
+  	   			c+=1;
+  	   			}
+  	   		}
+  	   		if(c>0){
+  	   			die1.removeChild(image1);
+    			die1.removeChild(image2);
+    			r=0;
+    			f=false;
+  	   		}
+  	   }
+    }
+    if(c==0){
+  	for(var i=0;i<6;i++){
+  		mov3[i]=0;
+  	if(player1[i].position[0]!=h1[i][0] && player1[i].position[1]!=h1[i][1] && x>=player1[i].position[0]-tileW/8 && x<=player1[i].position[0]+tileW/8 && y>=player1[i].position[1]-tileW/8 && y<=player1[i].position[1]+tileW/8 && c==0){mov1[i]=true;f=false;c+=1;}
+  	else{mov1[i]=false;}
+  	}
+  	
+  }
+  });
+}
+
+if(play3 && r==0)
+	{
+		play3=false;
+		f=false;
+	var button = document.createElement("button");
+    button.innerHTML = "roll";
+    image1 = document.createElement("img");
+	image2 = document.createElement("img");
+	
+	
+	 while (die3.hasChildNodes()) {
+    die3.removeChild(die3.firstChild);
+  	}
+	
+	while (die1.hasChildNodes()) {
+    die1.removeChild(die1.firstChild);
+  	}
+	die3.appendChild(button);
+	button.addEventListener ("click",function()
+	{
+  	 r1=Math.floor(Math.random()*4);
+ 	 r2=Math.floor(Math.random()*4);
+  	 face1="dice"+r1+".png";
+  	 face2="dice"+r2+".png";
+  	 image1.src=face1;
+  	 image2.src=face2;
+     die3.removeChild(button);
+     die3.appendChild(image1);
+  	 die3.appendChild(image2);
+  	 r=r1+r2;
+  	 if(r==0){r=12;}
+  	 if(r==12 || r==1 || r==5 || r==6)
+  	 {
+    	die3.appendChild(button);
+    	play3=true;
+  	 }
+  	 var fa=false;
+  	 if(r>1 && r<5){
+  	 	play1=true;
+  	 	fa=true;
+  	   		for(var k=0;k<6;k++)
+  	   		{
+  	   			if(player3[k].position[0]!=h3[k][0] && player3[k].position[1]!=h3[k][1]){
+  	   				fa=false;
+  	   				break;
+  	   			}
+  	   		}
+  	 }
+  	if(fa){
+  		r=0;f1=false;
+  	}
+  	else{
+  		f1=true;
+  	}
+});
+}
+if(f1){
+  can.addEventListener("mousedown",function(e)
+  {
+  	var x3=e.pageX-can.offsetLeft;
+  	var y3=e.pageY-can.offsetTop;
+  	var c1=0;
+  	if(r==1 || r==5 || r==6)
+  	{
+  	   if(x3>=4*tileW && x3<=5*tileW && y3>=8*tileH && y3<=9*tileH)
+  	   {
+  	   		for(var k=0;k<6 && c1<r;k++)
+  	   		{
+  	   			if(player3[k].position[0]==h3[k][0] && player3[k].position[1]==h3[k][1]){
+  	   			player3[k].placeAt(redRoute[0]%10, Math.floor(redRoute[0]/10));
+  	   			c1+=1;
+  	   			}
+  	   		}
+  	   		if(c1>0){
+  	   			die3.removeChild(image1);
+    			die3.removeChild(image2);
+    			r=0;
+    			f1=false;
+  	   		}
+  	   }
+    }
+    if(c1==0){
+  	for(var i=0;i<6;i++){
+  		mov1[i]=false;
+  	if(player3[i].position[0]!=h3[i][0] && player3[i].position[1]!=h3[i][1] && x3>=player3[i].position[0]-tileW/8 && x3<=player3[i].position[0]+tileW/8 && y3>=player3[i].position[1]-tileW/8 && y3<=player3[i].position[1]+tileW/8 && c1==0){mov3[i]=true;f1=false;c1+=1;}
+  	else{mov3[i]=false;}
+  	}
+  	
+  }
+  });
+}
+
+
+  for(var j=0;j<6;j++)
+  {
+	if(!player1[j].processMovement(blueRoute,path1[j],currentFrameTime) && path1[j]!=48 && r>0 && mov1[j])
+	{
+		
+		if((blueRoute[path1[j]+1]%10)!=(blueRoute[path1[j]]%10)) { 
+			player1[j].tileTo[0]= blueRoute[path1[j]+1]%10;
+		}
+		if(Math.floor(blueRoute[path1[j]+1]/10)!=Math.floor(blueRoute[path1[j]]/10)) { 
+			player1[j].tileTo[1]= Math.floor(blueRoute[path1[j]+1]/10);
+		}
+
+	if(player1[j].tileFrom[0]!=player1[j].tileTo[0] || player1[j].tileFrom[1]!=player1[j].tileTo[1])
+		{ player1[j].timeMoved = currentFrameTime;path1[j]+=1;r-=1; break;}
+	}
+	
+	else if(!player3[j].processMovement(redRoute,path3[j],currentFrameTime) && path3[j]!=48 && r>0 && mov3[j])
+	{
+		
+		if((redRoute[path3[j]+1]%10)!=(redRoute[path3[j]]%10)) { 
+			player3[j].tileTo[0]= redRoute[path3[j]+1]%10;
+		}
+		if(Math.floor(redRoute[path3[j]+1]/10)!=Math.floor(redRoute[path3[j]]/10)) { 
+			player3[j].tileTo[1]= Math.floor(redRoute[path3[j]+1]/10);
+		}
+
+	if(player3[j].tileFrom[0]!=player3[j].tileTo[0] || player3[j].tileFrom[1]!=player3[j].tileTo[1])
+		{ player3[j].timeMoved = currentFrameTime;path3[j]+=1;r-=1;break;}
+	}
+	}
+
+	if(r==0){
+		for(var i=0;i<6;i++)
+			{mov1[i]=false;mov3[i]=false;}
+	}
+	
+	for(var y = 0; y < mapH; ++y)
+	{
+		for(var x = 0; x < mapW; ++x)
+		{
+			if(gameMap[((y*mapW)+x)]!=0)
+			ctx.strokeRect( x*tileW, y*tileH, tileW, tileH);
+		    switch(gameMap[((y*mapW)+x)])
+			{
+				case 0: ctx.fillStyle = "lightgrey"; break;
+				case 4: ctx.fillStyle = "#33EEFF"; break;
+				case 40: ctx.fillStyle = "#5AFF33 "; break;
+				case 84:  ctx.fillStyle = "#FF8333"; break;
+				case 48:  ctx.fillStyle = "#F6FF33"; break;
+				case 14: ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#33EEFF"; break;
+				case 41:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#5AFF33"; break;
+				case 74:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#FF8333"; break;
+				case 47:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#F6FF33"; break;
+				case 26: ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#33EEFF"; break;
+				case 22:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#5AFF33"; break;
+				case 62:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#FF8333"; break;
+				case 66:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#F6FF33"; break;
+				case 34: ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#33EEFF"; break;
+				case 43:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#5AFF33"; break;
+				case 54:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#FF8333"; break;
+				case 45:  ctx.moveTo(x*tileW,y*tileH); ctx.lineTo(x*tileW+tileW,y*tileH+tileH);
+				ctx.moveTo((x+1)*tileW,y*tileH); ctx.lineTo(x*tileW,(y+1)*tileH);
+				ctx.fillStyle = "#F6FF33"; break;
+				default:
+					ctx.fillStyle = "white";
+			}
+			
+			ctx.fillRect( x*tileW, y*tileH, tileW, tileH);
+			ctx.stroke();
+		}
+	}
+
+	for(var i=0;i<6;i++)
+	{
+	ctx.fillStyle = "black";
+	ctx.beginPath();
+	ctx.arc(h1[i][0],h1[i][1],tileW/8,0,Math.PI*2);
+	ctx.stroke();
+	ctx.closePath();
+	ctx.beginPath();
+	ctx.arc(h2[i][0],h2[i][1],tileW/8,0,Math.PI*2);
+	ctx.stroke();
+	ctx.closePath();
+	ctx.beginPath();
+	ctx.arc(h3[i][0],h3[i][1],tileW/8,0,Math.PI*2);
+	ctx.stroke();
+	ctx.closePath();
+	ctx.beginPath();
+	ctx.arc(h4[i][0],h4[i][1],tileW/8,0,Math.PI*2);
+	ctx.stroke();
+	ctx.closePath();
+	}
+	
+	for(var j=0;j<6;j++)
+	{
+	ctx.fillStyle = "#3352FF";
+	ctx.beginPath();
+	ctx.arc(player1[j].position[0], player1[j].position[1], player1[j].dimensions[0]/2,0,Math.PI*2);
+	ctx.fill();
+	ctx.closePath();
+	ctx.fillStyle = "red";
+	ctx.beginPath();
+	ctx.arc(player3[j].position[0], player3[j].position[1], player3[j].dimensions[0]/2,0,Math.PI*2);
+	ctx.fill();
+	ctx.closePath();
+	}
+
+	
+	
+
+	requestAnimationFrame(drawGame);
+}
+</script>
+
+<style type="text/css">
+	body{
+		background: url("background.png") no-repeat center center fixed;
+  		background-repeat: no-repeat;
+  		background-size: cover;
+		align-items: center;
+		align-content: center;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+	#game{
+		border: 2px solid black;
+		margin: 5px 5px 5px 5px;
+	}
+	.d1 , .d2 , .d3 , .d4{
+		background-color: white;
+		border: 1px solid black;
+		width: 80px;
+		height: 80px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.d1{
+	display: flex;
+  	justify-content: center;
+  	align-items: center;
+  	align-content: center;
+  	text-align: center;
+	}
+	.mid{
+		display: flex;
+  	justify-content: center;
+	}
+	.d2{
+		display: flex;
+  		justify-content: center;
+		align-items: center;
+		margin-top: 185px;
+	}
+	.d4{
+		display: flex;
+  		justify-content: center;
+		align-items: center;
+		margin-top: 185px;
+	}
+	.d3{
+	display: flex;
+  	justify-content: center;
+  	align-items: center;
+	}
+
+</style>
+
+</head>
+<body>
+<div class="d1"></div>
+<div class="mid">
+<div class="d2"></div>
+<canvas id="game" width="450" height="450"></canvas>
+<div class="d4"></div>
+</div>
+<div class="d3"></div>
+</body>
+</html>

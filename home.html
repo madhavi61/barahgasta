@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Barahgasta</title>
+    <script type="text/javascript"> 
+window.onload = function(){ 
+    var dialog1 = document.getElementById('myFirstDialog');    
+     document.getElementById('show').onclick = function() {    
+        dialog1.show();    
+    };    
+    document.getElementById('hide').onclick = function() {    
+        dialog1.close();    
+    };
+
+    var dialog2 = document.getElementById('mySecondDialog');    
+     document.getElementById('show2').onclick = function() {
+      document.getElementById("c1").style.display = "none";
+        dialog2.show();   
+    };    
+    document.getElementById('hide2').onclick = function() {
+      document.getElementById("c1").style.display = "block";
+        dialog2.close(); 
+    };
+} ;     
+
+  function closeCurrentTab(){
+    var conf=confirm("Are you sure, you want to Quit the Game?");
+    if(conf==true){
+      close();
+    }
+  }
+</script>  
+
+<style type="text/css">
+.home{
+  background: url("background.png") no-repeat center center fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.e1{
+  position: relative;
+  text-align: right;
+}
+#c1{
+  text-align: center;
+  position: relative;
+  margin-top: 20%;
+}
+#c1>button{
+  font: italic bold 30px Georgia, serif;
+  color: #800080;
+}
+.e1>button{
+  font: italic bold Georgia, serif;
+  color: red;
+}
+#show{
+  position: fixed;
+  top: 90%;
+  left: 95%;
+}
+#show>img{
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+}
+h1{
+  color: white;
+}
+</style>
+  </head>
+
+<body class="home">
+
+  <div class="e1">
+     <button id="show2">?</button>
+     <button onclick="closeCurrentTab()">X</button>
+  </div>
+
+  <dialog id="myFirstDialog" style="width:20%;background-color:white;border:1px black;"> 
+  <p>Music</p>
+  <input type="range" min="1" max="100" value="50">
+  <br>
+  <p>SFX</p>
+  <input type="range" min="1" max="100" value="50">
+  <button id="hide">Close</button>  
+  </dialog>
+
+  <dialog id="mySecondDialog" style="width:80%;background-color:white;border:1px black;">
+    <div style="font: italic bold 20px Georgia, serif;text-align: center;color: #800080;">Barahgasta Game Rules</div>
+    <br>
+1.  The game can be played by 2 to 4 members.<br>
+2.  Each player has 6 pawns.<br>
+3.  For a player to win, he/she must move all their pawns to the center square.<br>
+4.  Each player will get second chance to cast the dice if he gets 1,2,6 or 0(here 0 means barah/12)
+<br>
+5.  At first all the pawns are in dead state,they get alive if the player gets 1/5/6. For 1,5,6 atmost 1,5,6 pawn can be alive and atleast 1,1,1 get alive respectively.<br>
+6.  If the pawns are alive the player is able to move them one at a time.<br>
+7.  If a player has cast 2,3 or 4( also 1,5,6,0/12), then he/she needs to choose one of their pawns and move it that many squares along the path designated for that player. The player needs to be able to smartly choose a pawn to move, so that it optimizes his chance of winning the game. <br>
+8.  "Hit": Pawns of two different players cannot exist in the same square, other than a "Safe" square, which are marked with an X and are colored<br>
+9.   If the pawn of player A lands on the same square of a pawn of player B, then player A has "hit" player B. Player B's pawn is returned to its starting square(dead state and it can not be moved until it gets alive) and this pawn needs to start over. And player A get another chance to roll the dice.<br>
+10.  For a player's pawn to progress into the inner squares, he should have "hit" at least one of his opponent's pawns. This condition is imposed on the player and not on his pawn. For example, even if one of the player's pawns has hit one of the opponent's, then all his other pawns will be eligible to enter the inner square. If it so happens that a player cannot move any of his pawns because he has not "hit" any of his opponents, then the player will lose that turn.<br>
+11.  Reaching the central square: A pawn needs to reach the central square exactly. For example, if a pawn is 3 squares away from the center and the player throws a 4, then that pawn cannot be moved. If that is the only pawn left for the player to move , the player will lose his turn.<br>
+12. If only  player A  hit player B`s pawn and player B didn`t get chance to hit player A until all the pawns of player A reached inner squares, then player A will won the game<br>
+<div style="text-align: right;"><button id="hide2">Close</button></div>
+  </dialog>
+  <div id="c1">
+      <h1>Barahgasta</h1><br>
+      <h1>Game</h1><br>
+      <button onclick="window.location.href = 'players.html';">Play</button>
+  </div>
+
+  <div>  
+  <button id="show"><img src="settings.png" alt="show"></button>
+  </div>
+
+  </body>
+</html>
