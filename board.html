@@ -1,17 +1,3 @@
-<!--
-<!DOCTYPE html>
-<html>
-<head>
-	<title>board</title>
-	<script type="text/javascript" src="index.js"></script>
-</head>
-<body>
-
-</body>
-</html>
-http://technologies4.me/articles/character-movement-input-tile-map-a2/character-input-source-code-p5/
--->
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,31 +25,24 @@ var mapW = 9, mapH = 9;
 var die1,die3;
 var r1,r2,face1,face2,image1,image2;
 var r=0;
-
 var h1=[[tileW*4+tileW/4,tileH/4],[tileW*4+2*tileW/4,tileH/4],[tileW*4+3*tileW/4,tileH/4],[tileW*4+tileW/4,3*tileH/4],[tileW*4+2*tileW/4,3*tileH/4],[tileW*4+3*tileW/4,3*tileH/4]];
 var h2=[[tileW/4,tileW*4+tileH/4],[tileW/4,tileW*4+2*tileH/4],[tileW/4,tileW*4+3*tileH/4],[3*tileW/4,tileW*4+tileH/4],[3*tileW/4,tileW*4+2*tileH/4],[3*tileW/4,tileW*4+3*tileH/4]];
 var h3=[[tileW*4+tileW/4,tileW*8+tileH/4],[tileW*4+2*tileW/4,tileW*8+tileH/4],[tileW*4+3*tileW/4,tileW*8+tileH/4],[tileW*4+tileW/4,tileW*8+3*tileH/4],[tileW*4+2*tileW/4,tileW*8+3*tileH/4],[tileW*4+3*tileW/4,tileW*8+3*tileH/4]];
 var h4=[[tileW*8+tileW/4,tileW*4+tileH/4],[tileW*8+tileW/4,tileW*4+2*tileH/4],[tileW*8+tileW/4,tileW*4+3*tileH/4],[tileW*8+3*tileW/4,tileW*4+tileH/4],[tileW*8+3*tileW/4,tileW*4+2*tileH/4],[tileW*8+3*tileW/4,tileW*4+3*tileH/4]];
-
-
 var blueRoute = [14,13,12,11,21,31,41,51,61,71,72,73,74,75,76,77,67,57,47,37,27,17,16,15,
 26,36,46,56,66,65,64,63,62,52,42,32,22,23,24,25,35,45,55,54,53,43,33,34,44];
-
 var redRoute = [74,75,76,77,67,57,47,37,27,17,16,15,14,13,12,11,21,31,41,51,61,71,72,73,
 62,52,42,32,22,23,24,25,26,36,46,56,66,65,64,63,53,43,33,34,35,45,55,54,44];
-
 var player1 = [new Character(blueRoute,path1,h1,0),new Character(blueRoute,path1,h1,1),new Character(blueRoute,path1,h1,2),new Character(blueRoute,path1,h1,3),new Character(blueRoute,path1,h1,4),new Character(blueRoute,path1,h1,5)];
 /*var player2 = [new Character(h2,0),new Character(h2,1),new Character(h2,2),new Character(h2,3),new Character(h2,4),new Character(h2,5)]; */
 var player3 = [new Character(redRoute,path3,h3,0),new Character(redRoute,path3,h3,1),new Character(redRoute,path3,h3,2),new Character(redRoute,path3,h3,3),new Character(redRoute,path3,h3,4),new Character(redRoute,path3,h3,5)];
 /*var player4 = [new Character(h4,0),new Character(h4,1),new Character(h4,2),new Character(h4,3),new Character(h4,4),new Character(h4,5)];*/
-
-
 function Character(route,path,h,m)
 {
 	this.tileFrom	= [route[path[m]]%10,Math.floor(route[path[m]]/10)];
 	this.tileTo		= [route[path[m]]%10,Math.floor(route[path[m]]/10)];
 	this.timeMoved	= 0;
-	this.dimensions	= [tileW/5,tileH/5];
+	this.dimensions	= [tileW/4,tileH/4];
 	this.position	= [h[m][0],h[m][1]];	
 	this.delayMove	= 700;
 }
@@ -76,7 +55,6 @@ Character.prototype.placeAt = function(x, y)
 Character.prototype.processMovement = function(route,path,t)
 {
 	if(this.tileFrom[0]==this.tileTo[0] && this.tileFrom[1]==this.tileTo[1]) { return false; }
-
 	if((t-this.timeMoved)>=this.delayMove)
 	{
 		this.placeAt(route[path]%10, Math.floor(route[path]/10));
@@ -90,7 +68,6 @@ Character.prototype.processMovement = function(route,path,t)
 			var diff = (tileW / this.delayMove) * (t-this.timeMoved);
 			this.position[0]+= (this.tileTo[0]<this.tileFrom[0] ? 0 - diff : diff);
 		}
-
 		if(this.tileTo[1] != this.tileFrom[1])
 		{
 			var diff = (tileH / this.delayMove) * (t-this.timeMoved);
@@ -99,11 +76,8 @@ Character.prototype.processMovement = function(route,path,t)
 		this.position[0] = Math.round(this.position[0]);
 		this.position[1] = Math.round(this.position[1]);
 	}
-
 	return true;
 }
-
-
 window.onload = function()
 {
 	can=document.getElementById('game');
@@ -113,10 +87,8 @@ window.onload = function()
 	requestAnimationFrame(drawGame);
 	
 };
-
 function drawGame()
 {
-
 	if(ctx==null) { return; }
 	var currentFrameTime = Date.now();
 	if(play1 && r==0)
@@ -203,14 +175,25 @@ if(f){
     if(c==0){
   	for(var i=0;i<6;i++){
   		mov3[i]=0;
-  	if(player1[i].position[0]!=h1[i][0] && player1[i].position[1]!=h1[i][1] && x>=player1[i].position[0]-tileW/8 && x<=player1[i].position[0]+tileW/8 && y>=player1[i].position[1]-tileW/8 && y<=player1[i].position[1]+tileW/8 && c==0){mov1[i]=true;f=false;c+=1;}
+  	if((player1[i].position[0]!=h1[i][0] || player1[i].position[1]!=h1[i][1]) && x>=player1[i].position[0]-tileW/8 && x<=player1[i].position[0]+tileW/8 && y>=player1[i].position[1]-tileW/8 && y<=player1[i].position[1]+tileW/8 && c==0 && (path1[i]+r)<=48){
+  		colide=false;
+  		if((path1[i]+r)!=6 && (path1[i]+r)!=12 && (path1[i]+r)!=18 && (path1[i]+r)!=24 && (path1[i]+r)!=24 && (path1[i]+r)!=28 && (path1[i]+r)!=32 && (path1[i]+r)!=36 && (path1[i]+r)!=41 && (path1[i]+r)!=43 && (path1[i]+r)!=45 && (path1[i]+r)!=47 && (path1[i]+r)!=48)
+  		{
+  			for(var j=0;j<6;j++)
+  			{
+  				if((path1[i]+r) == path1[j])
+  				{colide=true;}
+  			}
+  		}
+  		if(!colide){mov1[i]=true;f=false;c+=1;}
+  		else{mov1[i]=false;}
+  	}
   	else{mov1[i]=false;}
   	}
   	
   }
   });
 }
-
 if(play3 && r==0)
 	{
 		play3=false;
@@ -295,15 +278,25 @@ if(f1){
     if(c1==0){
   	for(var i=0;i<6;i++){
   		mov1[i]=false;
-  	if(player3[i].position[0]!=h3[i][0] && player3[i].position[1]!=h3[i][1] && x3>=player3[i].position[0]-tileW/8 && x3<=player3[i].position[0]+tileW/8 && y3>=player3[i].position[1]-tileW/8 && y3<=player3[i].position[1]+tileW/8 && c1==0){mov3[i]=true;f1=false;c1+=1;}
+  	if((player3[i].position[0]!=h3[i][0] || player3[i].position[1]!=h3[i][1]) && x3>=player3[i].position[0]-tileW/8 && x3<=player3[i].position[0]+tileW/8 && y3>=player3[i].position[1]-tileW/8 && y3<=player3[i].position[1]+tileW/8 && c1==0 && (path3[i]+r)<=48)
+  	{
+  		colide3=false;
+  		if((path3[i]+r)!=6 && (path3[i]+r)!=12 && (path3[i]+r)!=18 && (path3[i]+r)!=24 && (path3[i]+r)!=24 && (path3[i]+r)!=28 && (path3[i]+r)!=32 && (path3[i]+r)!=36 && (path3[i]+r)!=41 && (path3[i]+r)!=43 && (path3[i]+r)!=45 && (path3[i]+r)!=47 &&(path3[i]+r)!=48)
+  		{
+  		for(var j=0;j<6;j++)
+  			if((path3[i]+r)==path3[j])
+  			{colide3=true;}
+  		}
+  		if(!colide3){mov3[i]=true;f1=false;c1+=1;}
+  		else{mov3[i]=false;}
+
+  	}
   	else{mov3[i]=false;}
   	}
   	
   }
   });
 }
-
-
   for(var j=0;j<6;j++)
   {
 	if(!player1[j].processMovement(blueRoute,path1[j],currentFrameTime) && path1[j]!=48 && r>0 && mov1[j])
@@ -315,7 +308,6 @@ if(f1){
 		if(Math.floor(blueRoute[path1[j]+1]/10)!=Math.floor(blueRoute[path1[j]]/10)) { 
 			player1[j].tileTo[1]= Math.floor(blueRoute[path1[j]+1]/10);
 		}
-
 	if(player1[j].tileFrom[0]!=player1[j].tileTo[0] || player1[j].tileFrom[1]!=player1[j].tileTo[1])
 		{ player1[j].timeMoved = currentFrameTime;path1[j]+=1;r-=1; break;}
 	}
@@ -329,15 +321,41 @@ if(f1){
 		if(Math.floor(redRoute[path3[j]+1]/10)!=Math.floor(redRoute[path3[j]]/10)) { 
 			player3[j].tileTo[1]= Math.floor(redRoute[path3[j]+1]/10);
 		}
-
 	if(player3[j].tileFrom[0]!=player3[j].tileTo[0] || player3[j].tileFrom[1]!=player3[j].tileTo[1])
 		{ player3[j].timeMoved = currentFrameTime;path3[j]+=1;r-=1;break;}
 	}
-	}
+  }
 
 	if(r==0){
+		for(var j=0;j<6;j++)
+		{
+			for(var k=0;k<6;k++)
+			{
+				if(redRoute[path3[k]]!=14 && redRoute[path3[k]]!=41 && redRoute[path3[k]]!=74 && redRoute[path3[k]]!=47 && redRoute[path3[k]]!=26 && redRoute[path3[k]]!=22 && redRoute[path3[k]]!=62 && redRoute[path3[k]]!=66 && redRoute[path3[k]]!=34 && redRoute[path3[k]]!=43 && redRoute[path3[k]]!=54 && redRoute[path3[k]]!=45 && redRoute[path3[k]]!=44)
+				{
+				if(redRoute[path3[k]]==blueRoute[path1[j]])
+				{
+					if(mov1[j])
+					{
+						player3[k].position=[h3[k][0],h3[k][1]];
+						path3[k]=0;
+						play1=true;
+						play3=false;
+					}
+					else
+					{
+						player1[j].position=[h1[j][0],h1[j][1]];
+						path1[j]=0;
+						play3=true;
+						play1=false;
+					}
+					break;
+				}
+				}
+			}
+		}
 		for(var i=0;i<6;i++)
-			{mov1[i]=false;mov3[i]=false;}
+		{mov1[i]=false;mov3[i]=false;}
 	}
 	
 	for(var y = 0; y < mapH; ++y)
@@ -397,7 +415,6 @@ if(f1){
 			ctx.stroke();
 		}
 	}
-
 	for(var i=0;i<6;i++)
 	{
 	ctx.fillStyle = "black";
@@ -423,19 +440,19 @@ if(f1){
 	{
 	ctx.fillStyle = "#3352FF";
 	ctx.beginPath();
-	ctx.arc(player1[j].position[0], player1[j].position[1], player1[j].dimensions[0]/2,0,Math.PI*2);
-	ctx.fill();
-	ctx.closePath();
-	ctx.fillStyle = "red";
-	ctx.beginPath();
-	ctx.arc(player3[j].position[0], player3[j].position[1], player3[j].dimensions[0]/2,0,Math.PI*2);
+	ctx.arc(player1[j].position[0], player1[j].position[1], player1[j].dimensions[0]/2.5,0,Math.PI*2);
 	ctx.fill();
 	ctx.closePath();
 	}
-
+	for(var j=0;j<6;j++)
+	{
+	ctx.fillStyle = "red";
+	ctx.beginPath();
+	ctx.arc(player3[j].position[0], player3[j].position[1], player3[j].dimensions[0]/2.5,0,Math.PI*2);
+	ctx.fill();
+	ctx.closePath();
+	}
 	
-	
-
 	requestAnimationFrame(drawGame);
 }
 </script>
@@ -465,7 +482,6 @@ if(f1){
 		flex-direction: column;
 		justify-content: center;
 	}
-
 	.d1{
 	display: flex;
   	justify-content: center;
@@ -494,7 +510,6 @@ if(f1){
   	justify-content: center;
   	align-items: center;
 	}
-
 </style>
 
 </head>
